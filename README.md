@@ -10,7 +10,7 @@
 - To return a response, you should be returning three values: `responseContent`, `responseHeaders` and `responseCode`. and all of them shouldn't be empty or decleared with other types. but to make it easy for the user. I created a full function called `makeResponse` in the `utils` folder. that works on returning the response to the server and fill the missing fields and validate it. and it could be used to render templates too. allowing you to use WEngine syntax inside of your HTML file and pass variables to it.
 
 ## How To Use WEngine?
-- Make sure you read the documentations for WEngine. to avoid adding extra content to the README the documentations has been moved to readthedocs and you should find the link to it under the project description. or you can visit: [URL](URL)
+- Make sure you read the documentations for WEngine. to avoid adding extra content to the README the documentations has been moved to readthedocs and you should find the link to it under the project description. or you can visit: [https://wengine.readthedocs.io/en/latest/](https://wengine.readthedocs.io/en/latest/)
 
 ## Security
 - WEngine has been built with a secure way for both the client-side and the server-side. Most of the protections there on the server is managed by the user. you're able to disable it or to enable it. make sure you see `config/settings.py` and modify what won't fit with your application. otherwise that can result in a real security issues on your application.
