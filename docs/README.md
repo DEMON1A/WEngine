@@ -1,3 +1,12 @@
+# makeResponse Function
+- In the utils. there's a functions called makeResponse used to return the response to the server. in this case there's multiple functions inside of it:
+- **returnBasicHTTPResponse** - **Return a static content to the client from the server**
+- **returnBasicFileContent** - **Read a local file from the disk then return it's content to the client**
+- **returnRenderedTemplate** - **Use the template engine to parse the template and return the response to the client**
+
+# Creating a route
+- To create a route for your application. you need a very basic steps. first of all you should go to `config/routes.py` then add a new value on the dict with your route and it's python handler name. for example you want to add `/test` route. so you go to `config/routes.py` and modify `routes` variables to add into it another value called: `"/test:" "testHandler.py"`. after that. you should go to `handlers` folder then create a file called `testHandler.py`. after that you should import the `makeResponse` function from the `utils` folder then use the function you need. let's say you have a template that should return the date. so you should use `returnRenderedTemplate` function on your code then add the filename, response headers, response code, and the variables dict if there is.
+
 # Template Engine
 - In WEngine, it uses it's own template engine that have it's own syntax on the code. the first thing you should know here is that every syntax you're adding should end with `,` or your syntax won't be parsed by the template engine. that can cause problems with your code and mess up with the parsing processes.
 
@@ -52,3 +61,14 @@ urlencode
 ### removetags
 - It takes a user controlled variables from the handler then remove the tags from it and reutrn the replaced string
 
+### removeqoutes
+- It takes a user controlled variables from the handler then remove the qoutes from it and reutrn the replaced string
+
+### markdown
+- It takes a user controlled vairable then parse it with markdown and reutrn it on the response.
+
+### securemarkdown
+- It takes a user controlled vairable then parse it with markdown and reutrn it on the response with a secure way and XSS filters inside of it.
+
+### readfile
+- It takes a static argument from the template then read it's content and return the file content on the response.
