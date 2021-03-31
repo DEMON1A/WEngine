@@ -141,7 +141,7 @@ class serverHandler(BaseHTTPRequestHandler):
 
                     self.end_headers()
                     self.wfile.write(Content.encode())
-                except Exception:
+                except Exception as e:
                     Content, Headers, Code = callHanlder("404Handler.py", self.requestHeaders)
 
                     self.send_response(Code)
