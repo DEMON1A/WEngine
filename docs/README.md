@@ -29,6 +29,34 @@ def Handler(requestHeaders):
     return returnRenderedTemplate("index.html", {}, 200, {"name":"user"})
 ```
 
+# Dealing with request headers
+- WEngine allows you to access the request headers and information via a dict getting passing into your handler function. all of your headers names are in lower case, and if the header doesn't exists then the function will return an error and i guess you know how to deal with dicts. but there's a special headers on the request headers like `client-ip` that you can use to grap the user IP address and `request-method` that's used to grab the request method
+
+### Examples:
+- Client-IP
+```python
+from utils.makeResponse import returnHTTPBasicResponse
+
+def Handler(requestHeaders):
+    return returnBasicHTTPResponse(f'Your ip address is: {requestHeaders['client-ip']}', {}, 200)
+```
+
+- Request-Method
+```python
+from utils.makeResponse import returnHTTPBasicResponse
+
+def Handler(requestHeaders):
+    return returnBasicHTTPResponse(f'Request Method: {requestHeaders['request-method']}', {}, 200)
+```
+
+- Otherwise you can grab other headers on the request like `user-agent` or any other header
+```python
+from utils.makeResponse import returnHTTPBasicResponse
+
+def Handler(requestHeaders):
+    return returnBasicHTTPResponse(f'User-agent: {requestHeaders['user-agent']}', {}, 200)
+```
+
 # Creating a route
 - To create a route for your application. you need a very basic steps. first of all you should go to `config/routes.py` then add a new value on the dict with your route and it's python handler name. for example you want to add `/test` route. so you go to `config/routes.py` and modify `routes` variables to add into it another value called: `"/test": "testHandler.py"`. after that. you should go to `handlers` folder then create a file called `testHandler.py`. after that you should import the `makeResponse` function from the `utils` folder then use the function you need. let's say you have a template that should return the date. so you should use `returnRenderedTemplate` function on your code then add the filename, response headers, response code, and the variables dict if there is.
 
