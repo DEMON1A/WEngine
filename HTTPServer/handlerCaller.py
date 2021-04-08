@@ -18,4 +18,9 @@ def callHanlder(handlerName, requestHeaders):
         showError(exceptionRule="Handler Error", Message=f"The response code the {handlerName} is returning isn't a valid integar")
         exit()
 
+    try:
+        _ = responseHeaders['content-type']
+    except Exception:
+        responseHeaders['content-type'] = "text/html"
+
     return responseContent, responseHeaders, responseCode
