@@ -1,5 +1,5 @@
-# makeResponse Function
-- In the utils. there's a functions called makeResponse used to return the response to the server. in this case there's multiple functions inside of it:
+# MakeResponse Function
+- **In the utils. there's a functions called makeResponse used to return the response to the server. in this case there's multiple functions inside of it:**
 - **returnHTTPBasicResponse** - **Return a static content to the client from the server**
 - **returnBasicFileContent** - **Read a local file from the disk then return it's content to the client**
 - **returnRenderedTemplate** - **Use the template engine to parse the template and return the response to the client**
