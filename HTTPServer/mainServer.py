@@ -4,6 +4,7 @@ from http.server import BaseHTTPRequestHandler
 from utils.showMessage import showGood
 from utils.fileReader import readFile
 from utils.headersBuilder import bHeaders
+from utils.logsController import writeLogs
 
 from HTTPServer.handlerCaller import callHanlder
 from HTTPServer.securityHeaders import buildHeaders
@@ -20,7 +21,9 @@ class serverHandler(BaseHTTPRequestHandler):
         self.realPath = self.path.replace('//' , '/')
         self.applicationConfig = buildConfig()
         self.requestHeaders = bHeaders(self.headers)
+
         self.requestHeaders['client-ip'] = self.client_address[0]
+        self.requestHeaders['request-method'] = "GET"
 
         if self.realPath[-1:] == "/" and len(self.realPath) > 1:
             self.realPath = self.realPath[:-1]
@@ -40,6 +43,7 @@ class serverHandler(BaseHTTPRequestHandler):
 
                 self.end_headers()
                 self.wfile.write(Content.encode())
+                writeLogs(clientIP=self.requestHeaders['client-ip'], userAgent=self.requestHeaders['user-agent'], endpointVisited=self.realPath, responseCode=Code, requestMethod=self.requestHeaders['request-method'])
             except Exception as e:
                 Content, Headers, Code = callHanlder("500Handler.py", self.requestHeaders)
 
@@ -55,6 +59,7 @@ class serverHandler(BaseHTTPRequestHandler):
 
                 self.end_headers()
                 self.wfile.write(Content.encode())
+                writeLogs(clientIP=self.requestHeaders['client-ip'], userAgent=self.requestHeaders['user-agent'], endpointVisited=self.realPath, responseCode=Code, requestMethod=self.requestHeaders['request-method'])
         elif self.realPath[:len(STATIC_PATH)].replace('/', '') == STATIC_PATH.replace('/', ''):
             # static content should be served
             fileExtension = "".join(self.realPath.split('.')[-1:])
@@ -81,6 +86,7 @@ class serverHandler(BaseHTTPRequestHandler):
 
                 self.end_headers()
                 self.wfile.write(Content.encode())
+                writeLogs(clientIP=self.requestHeaders['client-ip'], userAgent=self.requestHeaders['user-agent'], endpointVisited=self.realPath, responseCode=Code, requestMethod=self.requestHeaders['request-method'])
             elif responseContent == True:
                 Content, Headers, Code = callHanlder("403Handler.py", self.requestHeaders)
 
@@ -96,6 +102,7 @@ class serverHandler(BaseHTTPRequestHandler):
 
                 self.end_headers()
                 self.wfile.write(Content.encode())
+                writeLogs(clientIP=self.requestHeaders['client-ip'], userAgent=self.requestHeaders['user-agent'], endpointVisited=self.realPath, responseCode=Code, requestMethod=self.requestHeaders['request-method'])
             else:
                 self.send_response(200)
                 self.send_header('content-type', contentType)
@@ -105,6 +112,7 @@ class serverHandler(BaseHTTPRequestHandler):
 
                 self.end_headers()
                 self.wfile.write(responseContent.encode())
+                writeLogs(clientIP=self.requestHeaders['client-ip'], userAgent=self.requestHeaders['user-agent'], endpointVisited=self.realPath, responseCode=200, requestMethod=self.requestHeaders['request-method'])
         else:
             if self.realPath[-1:] == "/":
                 checkString = self.realPath[:-1]
@@ -126,6 +134,7 @@ class serverHandler(BaseHTTPRequestHandler):
 
                 self.end_headers()
                 self.wfile.write(Content.encode())
+                writeLogs(clientIP=self.requestHeaders['client-ip'], userAgent=self.requestHeaders['user-agent'], endpointVisited=self.realPath, responseCode=Code, requestMethod=self.requestHeaders['request-method'])
             else:
                 try:
                     serverHandler = routes[self.realPath]
@@ -141,6 +150,7 @@ class serverHandler(BaseHTTPRequestHandler):
 
                     self.end_headers()
                     self.wfile.write(Content.encode())
+                    writeLogs(clientIP=self.requestHeaders['client-ip'], userAgent=self.requestHeaders['user-agent'], endpointVisited=self.realPath, responseCode=Code, requestMethod=self.requestHeaders['request-method'])
                 except Exception as e:
                     Content, Headers, Code = callHanlder("404Handler.py", self.requestHeaders)
 
@@ -156,6 +166,7 @@ class serverHandler(BaseHTTPRequestHandler):
 
                     self.end_headers()
                     self.wfile.write(Content.encode())
+                    writeLogs(clientIP=self.requestHeaders['client-ip'], userAgent=self.requestHeaders['user-agent'], endpointVisited=self.realPath, responseCode=Code, requestMethod=self.requestHeaders['request-method'])
 
 def serveServer(serverPort, defaultDocument):
     httpServer = HTTPServer(('' , serverPort), serverHandler)
