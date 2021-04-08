@@ -48,7 +48,6 @@ class serverHandler(BaseHTTPRequestHandler):
                 Content, Headers, Code = callHanlder("500Handler.py", self.requestHeaders)
 
                 self.send_response(Code)
-                self.send_header('content-type', 'text/html')
 
                 if len(Headers) != 0:
                     for serverHeader,headerValue in Headers.items():
@@ -75,7 +74,6 @@ class serverHandler(BaseHTTPRequestHandler):
                 Content, Headers, Code = callHanlder("404Handler.py", self.requestHeaders)
 
                 self.send_response(Code)
-                self.send_header('content-type', 'text/html')
 
                 if len(Headers) != 0:
                     for serverHeader,headerValue in Headers.items():
@@ -91,7 +89,6 @@ class serverHandler(BaseHTTPRequestHandler):
                 Content, Headers, Code = callHanlder("403Handler.py", self.requestHeaders)
 
                 self.send_response(Code)
-                self.send_header('content-type', 'text/html')
 
                 if len(Headers) != 0:
                     for serverHeader,headerValue in Headers.items():
@@ -123,7 +120,6 @@ class serverHandler(BaseHTTPRequestHandler):
                 Content, Headers, Code = callHanlder("403Handler.py", self.requestHeaders)
 
                 self.send_response(Code)
-                self.send_header('content-type', 'text/html')
 
                 if len(Headers) != 0:
                     for serverHeader,headerValue in Headers.items():
@@ -155,7 +151,6 @@ class serverHandler(BaseHTTPRequestHandler):
                     Content, Headers, Code = callHanlder("404Handler.py", self.requestHeaders)
 
                     self.send_response(Code)
-                    self.send_header('content-type', 'text/html')
 
                     if len(Headers) != 0:
                         for serverHeader,headerValue in Headers.items():
