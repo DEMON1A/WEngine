@@ -8,7 +8,6 @@ changing the main pattern of the application.
 you can always create more functions inside of the mode class but you should call
 all of them inside of the main function that has the same name as the class
 '''
-
 class runserver:
     def __init__(self):
         pass
@@ -49,4 +48,9 @@ class cleanlogs:
         pass
 
     def cleanlogs(self, serverConfig):
-        pass
+        from utils.logsController import cleanServerLogs
+        if cleanServerLogs():
+            from utils.showMessage import showGood
+            showGood(goodRule="Cleaned", Message="Logs has been cleaned and now the logs data is empty.")
+        else:
+            pass
