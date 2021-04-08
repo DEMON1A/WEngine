@@ -29,4 +29,7 @@ def buildHeaders():
     else:
         headersList['X-XSS-Protection'] = "0"
 
+    for singleHeader,singleValue in headersList.items():
+        headersList[singleHeader] = singleValue.replace('\n', '')
+
     return headersList
