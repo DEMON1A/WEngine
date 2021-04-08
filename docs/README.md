@@ -1,8 +1,33 @@
 # makeResponse Function
 - In the utils. there's a functions called makeResponse used to return the response to the server. in this case there's multiple functions inside of it:
-- **returnBasicHTTPResponse** - **Return a static content to the client from the server**
+- **returnHTTPBasicResponse** - **Return a static content to the client from the server**
 - **returnBasicFileContent** - **Read a local file from the disk then return it's content to the client**
 - **returnRenderedTemplate** - **Use the template engine to parse the template and return the response to the client**
+
+### Examples:
+- returnHTTPBasicResponse
+```python
+from utils.makeResponse import returnHTTPBasicResponse
+
+def Handler(requestHeaders):
+    return returnBasicHTTPResponse(f'Your ip address is: {requestHeaders['client-ip']}', {}, 200)
+```
+
+- returnBasicFileContent
+```python
+from utils.makeResponse import returnBasicFileContent
+
+def Handler(requestHeaders):
+    return returnBasicFileContent("index.html", {}, 200)
+```
+
+- returnRenderedTemplate
+```python
+from utils.makeResponse import returnRenderedTemplate
+
+def Handler(requestHeaders):
+    return returnRenderedTemplate("index.html", {}, 200, {"name":"user"})
+```
 
 # Creating a route
 - To create a route for your application. you need a very basic steps. first of all you should go to `config/routes.py` then add a new value on the dict with your route and it's python handler name. for example you want to add `/test` route. so you go to `config/routes.py` and modify `routes` variables to add into it another value called: `"/test": "testHandler.py"`. after that. you should go to `handlers` folder then create a file called `testHandler.py`. after that you should import the `makeResponse` function from the `utils` folder then use the function you need. let's say you have a template that should return the date. so you should use `returnRenderedTemplate` function on your code then add the filename, response headers, response code, and the variables dict if there is.
