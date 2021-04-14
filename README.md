@@ -20,7 +20,8 @@
 - But BTW, if you think you found a security issue on WEngine. please [contact me](mailto:mdaif1332@gmail.com) and i will response ASAP. if you didn't notice a response from me. then feel free to submit an issue on github with it.
 
 ## What's New?
-- Server Logs With Full Details About Users Requests.
+- Server logs with full details about users requests.
+- Clean logs mode to allows users empty the log file.
 
 ## Collaborators :heart:
 - [Mohammed Matar](https://github.com/Micro0x00) - **( WEngine landing page design )**
