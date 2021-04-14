@@ -14,10 +14,11 @@ def buildHeaders():
 
     if X_POWERED_BY: headersList['X-Powered-By'] = f"{__NAME__} {__VERSION__}"
     if FRAME_OPTIONS: headersList['X-Frame-Options'] = FRAME_OPTIONS
-    if CORS_ENABLED: headersList['Access-Control-Allow-Origin'] = CORS_ORIGIN
-    
-    if CORS_CREDENTIALS: headersList['Access-Control-Allow-Credentials'] = "true"
-    else: headersList['Access-Control-Allow-Credentials'] = "false"
+    if CORS_ENABLED:
+        headersList['Access-Control-Allow-Origin'] = CORS_ORIGIN
+
+        if CORS_CREDENTIALS: headersList['Access-Control-Allow-Credentials'] = "true"
+        else: headersList['Access-Control-Allow-Credentials'] = "false"
 
     if XSS_PROTECTION_HEADER:
         if XSS_PROTECTION_MODE and XSS_PROTECTION_REPORT_URI:
