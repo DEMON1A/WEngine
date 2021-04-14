@@ -75,239 +75,322 @@ class templatesParser:
         else:
             return []
 
-    def url_to(self, templateSyntax, templateVariables={}):
-        detectPattern = r"url\_to\((..*|)\)"
+    def filterString(self, templateSyntax, functionName):
+        fString = templateSyntax.replace(functionName, '')
+        fString = fString.strip()
 
-        detectFunction = re.search(detectPattern, templateSyntax)
-        if detectFunction != None:
-            functionArguments = detectFunction.group()[6:][1:][:-1]
-            if ":" in functionArguments:
-                argumentsList = functionArguments.split(':')
-                
-                try:
-                    firstArgument = argumentsList[0].replace('"', '').replace("'", '').strip()
-                    secondArgument = argumentsList[1].replace('"', '').replace("'", '').strip()
+        return fString
 
-                    try:
-                        basePath = urlModes[firstArgument]
-                        basePath += f"/{secondArgument}"
-                    except Exception:
-                        basePath = secondArgument
-                except Exception:
-                    basePath = firstArgument
-            elif functionArguments == "" or functionArguments == " ":
-                basePath = "/"
+    def detectFunction(self, templateSyntax):
+        charactersList = []
+
+        for singleCharacter in templateSyntax:
+            if singleCharacter != "(":
+                charactersList.append(singleCharacter)
             else:
-                basePath = functionArguments.replace('"', '').replace("'", '')
-            basePath = basePath.replace('//', '/')
-        else:
-            basePath = ""
+                break
 
+        functionName = ''.join(charactersList)
+        return functionName
+    
+    def getArguments(self, templateSyntax, functionName):
+        argumentString = templateSyntax[:-1][1:]
+        argumentString = argumentString.strip()
+
+        return argumentString
+
+    def getQoutes(self, aString, detectionStr):
+        stringList = []
+        stringsList = []
+        firstdStringFound = False
+
+        for singleCharacter in aString:
+            if singleCharacter == detectionStr:
+                if firstdStringFound:
+                    stringList.append(singleCharacter)
+                    realString = ''.join(stringList)
+                    stringsList.append(realString)
+
+                    firstdStringFound = False
+                    stringList = []
+                else:
+                    firstdStringFound = True
+                    stringList.append(singleCharacter)
+            elif firstdStringFound:
+                stringList.append(singleCharacter)
+            else:
+                pass
+
+        return stringsList
+
+    def parseArguments(self, templateSyntax):
+        globalCounter = 0
+        argumentsMap = {}
+
+        functionName = self.detectFunction(templateSyntax)
+        templateSyntax = self.filterString(templateSyntax, functionName)
+
+        argumentString = self.getArguments(templateSyntax, functionName)
+        argumentsList = []
+
+        argumentsList += self.getQoutes(argumentString, "'")
+        argumentsList += self.getQoutes(argumentString, '"')
+
+        for singleQoute in argumentsList:
+            globalCounter += 1
+            replaceString = f"arg{str(globalCounter)}"
+            argumentsMap[replaceString] = singleQoute
+            argumentString = argumentString.replace(singleQoute, replaceString)
+
+        argumentsParameters = argumentString.split(':')
+        fullValueParameters = []
+
+        for singleParameter in argumentsParameters:
+            singleParameter = singleParameter.strip()
+            fullValueParameters.append(argumentsMap[singleParameter].replace('"', '').replace("'", ''))
+
+        return fullValueParameters
+
+    def detectMode(self, modeString):
+        if modeString.lower() == "variable" or modeString.lower() == "var":
+            return "variable"
+        elif modeString.lower() == "global" or modeString.lower() == "glob":
+            return "global"
+        else:
+            return "global"
+
+    def url_to(self, templateSyntax, templateVariables={}):
+        syntaxArguments = self.parseArguments(templateSyntax)
+        Mode = self.detectMode(syntaxArguments[0])
+
+        if Mode == "variable":
+            try:
+                variableValue = templateVariables[syntaxArguments[2]]
+
+                basePath = urlModes[syntaxArguments[1]]
+                basePath += f"{variableValue}"
+            except Exception:
+                showError(exceptionRule="Mode/Variable Error", Message="There's an error with the mode or the variable, check both of them.")
+                return ""
+        else:
+            try:
+                basePath = urlModes[syntaxArguments[1]]
+                basePath += f"{syntaxArguments[2]}"
+            except Exception:
+                showError(exceptionRule="Mode Error", Message="There's an error with your mode, double check it.")
+                return ""
+
+        basePath = basePath.replace('//', '/')
         return basePath
 
     def exec(self, templateSyntax, templateVariables={}):
         if ALLOW_TEMPLATE_EXEC:
-            detectPattern = r"exec\((.*|)\)"
+            syntaxArguments = self.parseArguments(templateSyntax)
+            Mode = self.detectMode(syntaxArguments[0])
 
-            detectFunction = re.search(detectPattern, templateSyntax)
-            if detectFunction != None:
-                functionsArgument = detectFunction.group()[4:][1:][:-1]
-                functionsArgument = functionsArgument.replace('"', '').replace("'", '').strip()
-                exec(functionsArgument)
+            if Mode == "variable":
+                try:
+                    execValue = templateVariables[syntaxArguments[1]]
+                    exec(execValue)
+                    return ""
+                except Exception:
+                    showError(exceptionRule="Variables Error", Message="The variable you're using isn't defined.")
+                    return ""
+            else:
+                exec(syntaxArguments[1])
                 return ""
         else:
             return ""
 
     def system(self, templateSyntax, templateVariables={}):
         if ALLLOW_TEMPLATE_SYSTEM:
-            detectPattern = r"system\((.*|)\)"
+            syntaxArguments = self.parseArguments(templateSyntax)
+            Mode = self.detectMode(syntaxArguments[0])
 
-            detectFunction = re.search(detectPattern, templateSyntax)
-            if detectFunction != None:
-                functionsArgument = detectFunction.group()[6:][1:][:-1]
-                functionsArgument = functionsArgument.replace('"', '').replace("'", '').strip()
-                
-                cmdResults = popen(functionsArgument).read()
+            if Mode == "variable":
+                try:
+                    execValue = templateVariables[syntaxArguments[1]]
+                    cmdResults = popen(execValue).read()
+                    return cmdResults
+                except Exception:
+                    showError(exceptionRule="Variables Error", Message="The variable you're using isn't defined")
+                    return ""
+            else:
+                cmdResults = poepn(syntaxArguments[1]).read()
                 return cmdResults
         else:
             return ""
 
     def removetags(self, templateSyntax, templateVariables={}):
-        detectPattern = r"removetags\((.*|)\)"
+        syntaxArguments = self.parseArguments(templateSyntax)
+        Mode = self.detectMode(syntaxArguments[0])
 
-        detectFunction = re.search(detectPattern, templateSyntax)
-        if detectFunction != None:
-            functionsArgument = detectFunction.group()[10:][1:][:-1]
-            functionsArgument = functionsArgument.replace('"', '').replace("'", '').strip()
-            
+        if Mode == "variable":
             try:
-                replaceString = templateVariables[functionsArgument]
-                rString = replaceString.replace('<', '').replace('>', '')
-                return rString
+                variableValue = templateVariables[syntaxArguments[1]]
+                variableValue = variableValue.replace('<', '').replace('>', '')
+                return variableValue
             except Exception:
-                showError(exceptionRule="Template Error", Message="You're using a template variable that doesn't exists")
+                showError(exceptionRule="Variables Error", Message="The variable you're using isn't defined")
                 return ""
         else:
-            return ""
+            replaceString = syntaxArguments[1]
+            replaceString = replaceString.replace('<', '').replace('>', '')
+            return replaceString
 
     def removeqoutes(self, templateSyntax, templateVariables={}):
-        detectPattern = r"removeqoutes\((.*|)\)"
+        syntaxArguments = self.parseArguments(templateSyntax)
+        Mode = self.detectMode(syntaxArguments[0])
 
-        detectFunction = re.search(detectPattern, templateSyntax)
-        if detectFunction != None:
-            functionsArgument = detectFunction.group()[12:][1:][:-1]
-            functionsArgument = functionsArgument.replace('"', '').replace("'", '').strip()
-            
+        if Mode == "variable":
             try:
-                replaceString = templateVariables[functionsArgument]
-                rString = replaceString.replace('"', '').replace("'", '')
-                return rString
-            except Exception as e:
-                showError(exceptionRule="Template Error", Message="You're using a template variable that doesn't exists")
+                variableValue = templateVariables[syntaxArguments[1]]
+                variableValue = variableValue.replace('"', '').replace("'", '')
+                return variableValue
+            except Exception:
+                showError(exceptionRule="Variables Error", Message="The variable you're using isn't defined")
                 return ""
         else:
-            return ""
+            replaceString = syntaxArguments[1]
+            replaceString = replaceString.replace('"', '').replace("'", '')
+            return replaceString
 
     def markdown(self, templateSyntax, templateVariables={}):
-        detectPattern = r"markdown\((.*|)\)"
+        syntaxArguments = self.parseArguments(templateSyntax)
+        Mode = self.detectMode(syntaxArguments[0])
 
-        detectFunction = re.search(detectPattern, templateSyntax)
-        if detectFunction != None:
-            functionsArgument = detectFunction.group()[8:][1:][:-1]
-            functionsArgument = functionsArgument.replace('"', '').replace("'", '').strip()
-            
+        if Mode == "variable":
             try:
-                replaceString = templateVariables[functionsArgument]
-                rString = createMarkdown(mdSyntax=replaceString)
-                return rString
-            except Exception as e:
-                showError(exceptionRule="Template Error", Message="You're using a template variable that doesn't exists")
+                variableValue = templateVariables[syntaxArguments[1]]
+                variableValue = createMarkdown(mdSyntax=variableValue)
+                return variableValue
+            except Exception:
+                showError(exceptionRule="Variables Error", Message="The variable you're using isn't defined")
                 return ""
         else:
-            return ""
+            replaceString = syntaxArguments[1]
+            replaceString = createMarkdown(mdSyntax=replaceString)
+            return replaceString
 
     def securemarkdown(self, templateSyntax, templateVariables={}):
-        detectPattern = r"securemarkdown\((.*|)\)"
+        syntaxArguments = self.parseArguments(templateSyntax)
+        Mode = self.detectMode(syntaxArguments[0])
 
-        detectFunction = re.search(detectPattern, templateSyntax)
-        if detectFunction != None:
-            functionsArgument = detectFunction.group()[14:][1:][:-1]
-            functionsArgument = functionsArgument.replace('"', '').replace("'", '').strip()
-            
+        if Mode == "variable":
             try:
-                replaceString = templateVariables[functionsArgument]
-                rString = secureMarkdown(mdSyntax=replaceString)
-                return rString
-            except Exception as e:
-                showError(exceptionRule="Template Error", Message="You're using a template variable that doesn't exists")
+                variableValue = templateVariables[syntaxArguments[1]]
+                variableValue = secureMarkdown(mdSyntax=variableValue)
+                return variableValue
+            except Exception:
+                showError(exceptionRule="Variables Error", Message="The variable you're using isn't defined")
                 return ""
         else:
-            return ""
+            replaceString = syntaxArguments[1]
+            replaceString = secureMarkdown(mdSyntax=replaceString)
+            return replaceString
 
     def readfile(self, templateSyntax, templateVariables={}):
-        detectPattern = r"readfile\((.*|)\)"
+        syntaxArguments = self.parseArguments(templateSyntax)
+        Mode = self.detectMode(syntaxArguments[0])
 
-        detectFunction = re.search(detectPattern, templateSyntax)
-        if detectFunction != None:
-            functionsArgument = detectFunction.group()[8:][1:][:-1]
-            functionsArgument = functionsArgument.replace('"', '').replace("'", '').strip()
-            
+        if Mode == "variable":
             try:
-                replaceString = templateVariables[functionsArgument]
-                rString = readFile(replaceString)
-
-                if not rString: return ""
-                else: return rString
-            except Exception as e:
-                showError(exceptionRule="Template Error", Message="You're using a template variable that doesn't exists")
+                variableValue = templateVariables[syntaxArguments[1]]
+                variableValue = readFile(variableValue)
+                return variableValue
+            except Exception:
+                showError(exceptionRule="Variables Error", Message="The variable you're using isn't defined")
                 return ""
         else:
-            return ""
+            replaceString = syntaxArguments[1]
+            replaceString = readFile(replaceString)
+            return replaceString
 
     def base64(self, templateSyntax, templateVariables={}):
-        detectPattern = r"base64\((.*|)\)"
+        syntaxArguments = self.parseArguments(templateSyntax)
+        Mode = self.detectMode(syntaxArguments[0])
 
-        detectFunction = re.search(detectPattern, templateSyntax)
-        if detectFunction != None:
-            functionsArgument = detectFunction.group()[6:][1:][:-1]
-            functionsArgument = functionsArgument.replace('"', '').replace("'", '').strip()
-            
+        if Mode == "variable":
             try:
-                replaceString = templateVariables[functionsArgument]
-                rString = base64Encode(encodeString=replaceString)
-
-                if not rString: return ""
-                else: return rString
-            except Exception as e:
-                showError(exceptionRule="Template Error", Message="You're using a template variable that doesn't exists")
+                variableValue = templateVariables[syntaxArguments[1]]
+                variableValue = base64Encode(variableValue)
+                return variableValue
+            except Exception:
+                showError(exceptionRule="Variables Error", Message="The variable you're using isn't defined")
                 return ""
         else:
-            return ""
+            replaceString = syntaxArguments[1]
+            replaceString = base64Encode(replaceString)
+            return replaceString
 
     def base32(self, templateSyntax, templateVariables={}):
-        detectPattern = r"base32\((.*|)\)"
+        syntaxArguments = self.parseArguments(templateSyntax)
+        Mode = self.detectMode(syntaxArguments[0])
 
-        detectFunction = re.search(detectPattern, templateSyntax)
-        if detectFunction != None:
-            functionsArgument = detectFunction.group()[6:][1:][:-1]
-            functionsArgument = functionsArgument.replace('"', '').replace("'", '').strip()
-            
+        if Mode == "variable":
             try:
-                replaceString = templateVariables[functionsArgument]
-                rString = base32Encode(encodeString=replaceString)
-
-                if not rString: return ""
-                else: return rString
-            except Exception as e:
-                showError(exceptionRule="Template Error", Message="You're using a template variable that doesn't exists")
+                variableValue = templateVariables[syntaxArguments[1]]
+                variableValue = base32Encode(variableValue)
+                return variableValue
+            except Exception:
+                showError(exceptionRule="Variables Error", Message="The variable you're using isn't defined")
                 return ""
         else:
-            return ""
+            replaceString = syntaxArguments[1]
+            replaceString = base32Encode(replaceString)
+            return replaceString
 
     def date(self, templateSyntax, templateVariables={}):
-        detectPattern = r"date\((.*|)\)"
+        syntaxArguments = self.parseArguments(templateSyntax)
+        Mode = self.detectMode(syntaxArguments[0])
 
-        detectFunction = re.search(detectPattern, templateSyntax)
-        if detectFunction != None:
-            functionsArgument = detectFunction.group()[4:][1:][:-1]
-            functionsArgument = functionsArgument.replace('"', '').replace("'", '').strip()
+        currentDate = datetime.now()
+        dateString = f"{currentDate.year},{currentDate.month},{currentDate.day}"
 
-            currentDate = datetime.now()
-            dateString = f"{currentDate.year}{functionsArgument}{currentDate.month}{functionsArgument}{currentDate.day}"
-
-            return dateString
-        else:
-            return ""
-
-    def time(self, templateSyntax, templateVariables={}):
-        detectPattern = r"time\((.*|)\)"
-
-        detectFunction = re.search(detectPattern, templateSyntax)
-        if detectFunction != None:
-            functionsArgument = detectFunction.group()[4:][1:][:-1]
-            functionsArgument = functionsArgument.replace('"', '').replace("'", '').strip()
-
-            currentTime = strftime(f"%H{functionsArgument}%M{functionsArgument}%S", gmtime())
-            return currentTime
-        else:
-            return ""
-
-    def urlencode(self, templateSyntax, templateVariables={}):
-        detectPattern = r"urlencode\((.*|)\)"
-
-        detectFunction = re.search(detectPattern, templateSyntax)
-        if detectFunction != None:
-            functionsArgument = detectFunction.group()[9:][1:][:-1]
-            functionsArgument = functionsArgument.replace('"', '').replace("'", '').strip()
-
+        if Mode == "variable":
             try:
-                replaceString = templateVariables[functionsArgument]
-                rString = urlencode(replaceString)
-
-                if not rString: return ""
-                else: return rString
-            except Exception as e:
-                showError(exceptionRule="Template Error", Message="You're using a template variable that doesn't exists")
+                variableValue = templateVariables[syntaxArguments[1]]
+                variableValue = dateString.replace(',', variableValue)
+                return variableValue
+            except Exception:
+                showError(exceptionRule="Variables Error", Message="The variable you're using isn't defined")
                 return ""
         else:
-            return ""
+            replaceString = syntaxArguments[1]
+            replaceString = dateString.replace(',', replaceString)
+            return replaceString
+
+    def time(self, templateSyntax, templateVariables={}):
+        syntaxArguments = self.parseArguments(templateSyntax)
+        Mode = self.detectMode(syntaxArguments[0])
+
+        currentTime = strftime(f"%H,%M,%S", gmtime())
+        if Mode == "variable":
+            try:
+                variableValue = templateVariables[syntaxArguments[1]]
+                variableValue = currentTime.replace(',', variableValue)
+                return variableValue
+            except Exception:
+                showError(exceptionRule="Variables Error", Message="The variable you're using isn't defined")
+                return ""
+        else:
+            replaceString = syntaxArguments[1]
+            replaceString = currentTime.replace(',', replaceString)
+            return replaceString
+
+    def urlencode(self, templateSyntax, templateVariables={}):
+        syntaxArguments = self.parseArguments(templateSyntax)
+        Mode = self.detectMode(syntaxArguments[0])
+
+        if Mode == "variable":
+            try:
+                variableValue = templateVariables[syntaxArguments[1]]
+                variableValue = urlencode(variableValue)
+                return variableValue
+            except Exception:
+                showError(exceptionRule="Variables Error", Message="The variable you're using isn't defined")
+                return ""
+        else:
+            replaceString = syntaxArguments[1]
+            replaceString = urlencode(replaceString)
+            return replaceString
