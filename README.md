@@ -22,6 +22,7 @@
 ## What's New?
 - Server logs with full details about users requests.
 - Clean logs mode to allows users empty the log file.
+- New template engine, with bug fixes and fast syntax parsing.
 
 ## Collaborators :heart:
 - [Mohammed Matar](https://github.com/Micro0x00) - **( WEngine landing page design )**
