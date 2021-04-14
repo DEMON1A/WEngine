@@ -14,6 +14,7 @@ def buildHeaders():
 
     if X_POWERED_BY: headersList['X-Powered-By'] = f"{__NAME__} {__VERSION__}"
     if FRAME_OPTIONS: headersList['X-Frame-Options'] = FRAME_OPTIONS
+
     if CORS_ENABLED:
         headersList['Access-Control-Allow-Origin'] = CORS_ORIGIN
 
