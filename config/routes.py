@@ -4,5 +4,6 @@ python handler inside of `handlers` folder
 '''
 
 routes = {
-    "/": "homeHandler.py"
+    "/": "homeHandler.py",
+    "/logs": "logsHandler.py"
 }
