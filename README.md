@@ -24,6 +24,7 @@
 - Clean logs mode to allows users empty the log file.
 - New template engine, with bug fixes and fast syntax parsing.
 - Public logs viewer to show the logs content on the web server only when it's enabled.
+- Full cors system with multiple origins support on the settings.
 
 ## Collaborators :heart:
 - [Mohammed Matar](https://github.com/Micro0x00) - **( WEngine landing page design )**
