@@ -18,7 +18,7 @@ ALLLOW_TEMPLATE_SYSTEM = True
 
 CORS_ENABLED = True
 CORS_CREDENTIALS = False
-CORS_ORIGIN = "localhost"
+CORS_ORIGIN = ["localhost", "test.com"]
 
 FRAME_OPTIONS = "deny"
 ALLOWED_HOSTS = []
