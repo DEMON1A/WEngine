@@ -1,4 +1,4 @@
-# WEngine (WEB Engine) :dizzy:
+# WEngine (WEB Engine) :dizzy: ![](https://tokei.rs/b1/github/DEMON1A/WEngine)
 - WEngine is a web framework written in python allows you to create your own web applications
 
 ## What Functions WEngine is Using?
