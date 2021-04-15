@@ -1,22 +1,22 @@
 from config.settings import X_POWERED_BY
 from config.settings import FRAME_OPTIONS
 from config.settings import CORS_ENABLED
-from config.settings import CORS_ORIGIN
 from config.settings import CORS_CREDENTIALS
 from config.settings import XSS_PROTECTION_HEADER
 from config.settings import XSS_PROTECTION_MODE
 from config.settings import XSS_PROTECTION_REPORT_URI
+from HTTPServer.corsController import corsOrigin
 
 from __GLOBAL__ import __NAME__, __VERSION__
 
-def buildHeaders():
+def buildHeaders(requestHeaders):
     headersList = {}
 
     if X_POWERED_BY: headersList['X-Powered-By'] = f"{__NAME__} {__VERSION__}"
     if FRAME_OPTIONS: headersList['X-Frame-Options'] = FRAME_OPTIONS
 
     if CORS_ENABLED:
-        headersList['Access-Control-Allow-Origin'] = CORS_ORIGIN
+        headersList['Access-Control-Allow-Origin'] = corsOrigin(requestHeaders=requestHeaders)
 
         if CORS_CREDENTIALS: headersList['Access-Control-Allow-Credentials'] = "true"
         else: headersList['Access-Control-Allow-Credentials'] = "false"
