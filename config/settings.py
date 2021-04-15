@@ -9,6 +9,7 @@ STATIC_PATH = "static/"
 TMP_PATH = "tmp/"
 DEFAULT_DOCUMENT = "index.html"
 
+PUBLIC_LOGS = False
 X_POWERED_BY = True
 ALLOW_SYMLINKS = False
 
