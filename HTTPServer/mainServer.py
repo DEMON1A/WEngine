@@ -17,10 +17,10 @@ from config.settings import STATIC_PATH, BLOCKED_PATHS
 
 class serverHandler(BaseHTTPRequestHandler):
     def do_GET(self):
-        self.securityHeaders = buildHeaders()
         self.realPath = self.path.replace('//' , '/')
         self.applicationConfig = buildConfig()
         self.requestHeaders = bHeaders(self.headers)
+        self.securityHeaders = buildHeaders(self.requestHeaders)
 
         self.requestHeaders['client-ip'] = self.client_address[0]
         self.requestHeaders['request-method'] = "GET"
