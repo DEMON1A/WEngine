@@ -23,6 +23,7 @@
 - Server logs with full details about users requests.
 - Clean logs mode to allows users empty the log file.
 - New template engine, with bug fixes and fast syntax parsing.
+- Public logs viewer to show the logs content on the web server only when it's enabled.
 
 ## Collaborators :heart:
 - [Mohammed Matar](https://github.com/Micro0x00) - **( WEngine landing page design )**
