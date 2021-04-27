@@ -25,6 +25,7 @@
 - New template engine, with bug fixes and fast syntax parsing.
 - Public logs viewer to show the logs content on the web server only when it's enabled.
 - Full cors system with multiple origins support on the settings.
+- Setting/Deleting Cookies support with many security layers to keep it secure
 
 ## Collaborators :heart:
 - [Mohammed Matar](https://github.com/Micro0x00) - **( WEngine landing page design )**
