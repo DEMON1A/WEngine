@@ -71,6 +71,16 @@ def corsOrigin(requestHeaders):
 # should i use some re validation here?
 def validateCors(Origin, cOrigin):
     Origin = Origin.replace('https://', '').replace('http://', '')
+    originHost = Origin.split('.')
+
+    if len(originHost) > 2:
+        # there's a subdomain on the origin
+        mainHost = originHost[-2:]
+        replaceHost = '.'.join(originHost)
+        mainHost = '.'.join(mainHost)
+
+        Origin = Origin.replace(replaceHost, mainHost)
+
     NewOrigin = Origin[:len(cOrigin)]
     replaceString = Origin.replace(NewOrigin, '')
 
