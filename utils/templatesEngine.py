@@ -2,7 +2,7 @@ import re
 from os.path import exists
 from os import popen
 from datetime import datetime
-from urllib.parse import urlencode
+from urllib.parse import quote
 from time import gmtime, strftime
 
 from utils.showMessage import showError
@@ -385,7 +385,7 @@ class templatesParser:
         if Mode == "variable":
             try:
                 variableValue = templateVariables[syntaxArguments[1]]
-                variableValue = urlencode(variableValue)
+                variableValue = quote(variableValue)
                 return variableValue
             except Exception:
                 showError(exceptionRule="Variables Error", Message="The variable you're using isn't defined")
