@@ -26,6 +26,7 @@
 - Public logs viewer to show the logs content on the web server only when it's enabled.
 - Full cors system with multiple origins support on the settings.
 - Setting/Deleting Cookies support with many security layers to keep it secure
+- SQLite3 db interaction that makes it easy to interact with your database using a pre-made util.
 
 ## Collaborators :heart:
 - [Mohammed Matar](https://github.com/Micro0x00) - **( WEngine landing page design )**
