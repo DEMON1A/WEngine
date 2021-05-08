@@ -27,6 +27,7 @@
 - Full cors system with multiple origins support on the settings.
 - Setting/Deleting Cookies support with many security layers to keep it secure
 - SQLite3 db interaction that makes it easy to interact with your database using a pre-made util.
+- `createuser` and `migrate` options to add new user to the database and setup the SQLite db.
 
 ## Collaborators :heart:
 - [Mohammed Matar](https://github.com/Micro0x00) - **( WEngine landing page design )**
