@@ -46,6 +46,13 @@ def insertParser(dbConfig):
     questionMarkString = questionMarkString[:-1]
     return questionMarkString
 
+def searchQuery(dbConfig):
+    qstring = ""
+    for name,value in dbConfig.items():
+        qstring += f"{name}=? or "
+
+    return qstring[:-3]
+
 def getdbname(dbname):
     validateFolder()
     dbname = f"{__DB_BASE_FOLDER__}/{dbname}"
@@ -81,6 +88,18 @@ def appendData(dbname, tablename, dbConfig):
 
     dbConnection.commit()
     dbConnection.close()
+
+def search(dbname, tablename, dbConfig, variables):
+    dbname = getdbname(dbname)
+
+    dbConnection = sqlite3.connect(dbname)
+    dbExecution = dbConnection.cursor()
+
+    SQLsyntax = searchQuery(dbConfig)
+    dbExecution.execute(f"SELECT * FROM {tablename} WHERE {SQLsyntax}", variables)
+    dbData = dbExecution.fetchall()
+
+    return dbData
 
 def showAll(dbname, tablename):
     dbname = getdbname(dbname)
