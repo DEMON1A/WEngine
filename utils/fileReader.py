@@ -41,7 +41,7 @@ def readFile(filePath):
 
 def readFileByLines(filePath):
     try:
-        filePath = filePath.replace('../', '')
+        filePath = filePath.replace('..', '')
 
         if not ALLOW_SYMLINKS:
             if islink(filePath):
