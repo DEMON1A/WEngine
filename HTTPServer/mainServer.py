@@ -1,5 +1,6 @@
 from http.server import HTTPServer
 from http.server import BaseHTTPRequestHandler
+from socketserver import ThreadingMixIn
 
 from utils.showMessage import showGood
 from utils.fileReader import readFile
@@ -163,7 +164,10 @@ class serverHandler(BaseHTTPRequestHandler):
                     self.wfile.write(Content.encode())
                     writeLogs(clientIP=self.requestHeaders['client-ip'], userAgent=self.requestHeaders['user-agent'], endpointVisited=self.realPath, responseCode=Code, requestMethod=self.requestHeaders['request-method'])
 
+class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+    """Working on handling requests in a separate thread"""
+
 def serveServer(serverPort, defaultDocument):
-    httpServer = HTTPServer(('' , serverPort), serverHandler)
-    showGood(goodRule="Server Created" , Message=f"The Server is Running Successfully On Port {serverPort}")
+    httpServer = ThreadedHTTPServer(('' , serverPort), serverHandler)
+    showGood(goodRule="Server Created" , Message=f"The server is running successfully on port {serverPort}")
     httpServer.serve_forever()
