@@ -2,7 +2,7 @@ from utils.makeResponse import returnHTTPBasicResponse, returnRenderedTemplate
 from utils.logsController import readLogs
 from config.settings import PUBLIC_LOGS
 
-def Handler(responseHeaders):
+def Handler(requestHeaders):
     if PUBLIC_LOGS:
         return returnHTTPBasicResponse(readLogs(), {"content-type":"text/plain"}, 200)
     else:
