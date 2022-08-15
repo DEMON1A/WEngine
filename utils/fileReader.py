@@ -18,7 +18,7 @@ from config.settings import ALLOW_SYMLINKS
 
 def readFile(filePath):
     try:
-        filePath = filePath.replace('../', '')
+        filePath = filePath.replace('..', '')
 
         if not ALLOW_SYMLINKS:
             if islink(filePath):
