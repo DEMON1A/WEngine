@@ -83,7 +83,7 @@ class createuser:
     def createuser(self, serverConfig):
         from utils.dbConnections import appendData, getdbname, search
         from utils.showMessage import showGood, askForInput , coloredMessage, showError
-        from config.db import __DEFAULT_DB_NAME__, __DEFAULT_DB_TABLE__
+        from config.db import __DEFAULT_DB_NAME__, __DEFAULT_DB_TABLE__, __DEFAULT_DB_CONFIG__
 
         from getpass import getpass
         from hashlib import sha256
