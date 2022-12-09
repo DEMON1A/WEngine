@@ -9,6 +9,9 @@
 
 - To return a response, you should be returning three values: `responseContent`, `responseHeaders` and `responseCode`. and all of them shouldn't be empty or decleared with other types. but to make it easy for the user. I created a full function called `makeResponse` in the `utils` folder. that works on returning the response to the server and fill the missing fields and validate it. and it could be used to render templates too. allowing you to use WEngine syntax inside of your HTML file and pass variables to it.
 
+## How requests works inside WEngine?
+- Basicly, WEngine is just a set of routes inside a web server, whenever we get a request from the user requesting a specific route, the server attempts to look if this routes exists, if it does it tries to find it's handler and once it does it provides the route handler with the client request info, and takes the response content, response headers and response code from the handler, then returns it to the client
+
 ## How To Use WEngine?
 - Make sure you read the documentations for WEngine. to avoid adding extra content to the README the documentations has been moved to readthedocs and you should find the link to it under the project description. or you can visit: [https://wengine.readthedocs.io/en/latest/](https://wengine.readthedocs.io/en/latest/). but at the current time. the documentations isn't complete. take a deep look trying to understand how it works.
 
