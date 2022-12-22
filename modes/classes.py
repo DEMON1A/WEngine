@@ -10,19 +10,23 @@ all of them inside of the main function that has the same name as the class
 '''
 class runserver:
     def __init__(self):
-        pass
+        self.description = "Starts the web server on port 8080 by default"
 
     def runserver(self, serverConfig):
         serverPort = serverConfig['SERVER_PORT']
         defaultDocument = serverConfig['DEFAULT_DOCUMENT']
 
         from HTTPServer.mainServer import serveServer
-        serveServer(serverPort=serverPort, defaultDocument=defaultDocument)
+
+        try:
+            serveServer(serverPort=serverPort, defaultDocument=defaultDocument)
+        except KeyboardInterrupt:
+            print("Pressed")
 
 
 class checkstatic:
     def __init__(self):
-        pass
+        self.description = "Checks and validates if the static path has been created"
 
     def checkstatic(self, serverConfig):
         staticPath = serverConfig['STATIC_PATH']
@@ -45,7 +49,7 @@ class checkstatic:
 
 class cleanlogs:
     def __init__(self):
-        pass
+        self.description = "Deletes all the stored logs files stored on the server"
 
     def cleanlogs(self, serverConfig):
         from utils.logsController import cleanServerLogs
@@ -57,7 +61,7 @@ class cleanlogs:
 
 class migrate:
     def __init__(self):
-        pass
+        self.description = "Setup the database integeration by creating the database and the tables"
 
     def migrate(self, serverConfig):
         from utils.dbConnections import createDB, createTable
@@ -78,7 +82,7 @@ class migrate:
 
 class createuser:
     def __init__(self):
-        pass
+        self.description = "Creates a user for the admin on the database"
 
     def createuser(self, serverConfig):
         from utils.dbConnections import appendData, getdbname, search

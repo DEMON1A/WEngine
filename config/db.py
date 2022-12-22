@@ -4,7 +4,7 @@ __DEFAULT_DB_NAME__ = "main.db"
 __DEFAULT_DB_TABLE__ = "admins"
 
 __DEFAULT_DB_CONFIG__ = {
-    "first_name":"test",
+    "first_name":"text",
     "second_name":"text",
     "username":"text",
     "password":"text",

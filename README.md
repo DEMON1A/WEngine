@@ -36,4 +36,4 @@
 - [Mohammed Matar](https://github.com/Micro0x00) - **( WEngine landing page design )**
 
 ## Support WEngine
-- Giving WEngine a :star: on github will be great. that will allow other people to see it and use it. and i'm really thankful for that. otherwise you can support WEngine from the sponser links on the github. that will help improving WEngine with more functions and keep it a supported project to work on.
+- Giving WEngine a :star: on github will be great. that's the least you can do to support WEngine. and I would be really thankful for that!. You can also support WEngine from the sponser links on the github to help WEngine developers and keep it a maintained project.

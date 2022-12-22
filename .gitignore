@@ -55,3 +55,6 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Don't include local server logs
+server-logs/server.log

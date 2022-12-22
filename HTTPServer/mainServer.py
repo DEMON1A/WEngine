@@ -1,3 +1,6 @@
+import sys
+import os
+
 from http.server import HTTPServer
 from http.server import BaseHTTPRequestHandler
 from socketserver import ThreadingMixIn
@@ -7,7 +10,10 @@ from utils.fileReader import readFile
 from utils.headersBuilder import bHeaders
 from utils.logsController import writeLogs
 
-from HTTPServer.handlerCaller import callHanlder
+from utils.queryParser import parseQuery
+from utils.queryParser import parsePath
+
+from HTTPServer.handlerCaller import callHandler
 from HTTPServer.securityHeaders import buildHeaders
 
 from main import buildConfig
@@ -19,6 +25,8 @@ from config.settings import STATIC_PATH, BLOCKED_PATHS
 class serverHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.realPath = self.path.replace('//' , '/')
+        self.realPath = parsePath(self.realPath)
+        self.query = parseQuery(self.path)
         self.applicationConfig = buildConfig()
         self.requestHeaders = bHeaders(self.headers)
         self.securityHeaders = buildHeaders(self.requestHeaders)
@@ -32,7 +40,8 @@ class serverHandler(BaseHTTPRequestHandler):
         if self.realPath == "/":
             try:
                 serverHandler = routes['/']
-                Content, Headers, Code = callHanlder(serverHandler, self.requestHeaders)
+                print(serverHandler)
+                Content, Headers, Code = callHandler(serverHandler, self.requestHeaders, self.query)
 
                 self.send_response(Code)
                 if len(Headers) != 0:
@@ -46,8 +55,12 @@ class serverHandler(BaseHTTPRequestHandler):
                 self.wfile.write(Content.encode())
                 writeLogs(clientIP=self.requestHeaders['client-ip'], userAgent=self.requestHeaders['user-agent'], endpointVisited=self.realPath, responseCode=Code, requestMethod=self.requestHeaders['request-method'])
             except Exception as e:
-                Content, Headers, Code = callHanlder("500Handler.py", self.requestHeaders)
+                print(e)
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                print(exc_type, fname, exc_tb.tb_lineno)
 
+                Content, Headers, Code = callHandler("500Handler.py", self.requestHeaders, self.query)
                 self.send_response(Code)
 
                 if len(Headers) != 0:
@@ -72,7 +85,7 @@ class serverHandler(BaseHTTPRequestHandler):
             responseContent = readFile(self.realPath[1:])
 
             if not responseContent:
-                Content, Headers, Code = callHanlder("404Handler.py", self.requestHeaders)
+                Content, Headers, Code = callHandler("404Handler.py", self.requestHeaders, self.query)
 
                 self.send_response(Code)
 
@@ -87,7 +100,7 @@ class serverHandler(BaseHTTPRequestHandler):
                 self.wfile.write(Content.encode())
                 writeLogs(clientIP=self.requestHeaders['client-ip'], userAgent=self.requestHeaders['user-agent'], endpointVisited=self.realPath, responseCode=Code, requestMethod=self.requestHeaders['request-method'])
             elif responseContent == True:
-                Content, Headers, Code = callHanlder("403Handler.py", self.requestHeaders)
+                Content, Headers, Code = callHandler("403Handler.py", self.requestHeaders, self.query)
 
                 self.send_response(Code)
 
@@ -118,7 +131,7 @@ class serverHandler(BaseHTTPRequestHandler):
                 checkString = self.realPath
 
             if checkString in BLOCKED_PATHS:
-                Content, Headers, Code = callHanlder("403Handler.py", self.requestHeaders)
+                Content, Headers, Code = callHandler("403Handler.py", self.requestHeaders, self.query)
 
                 self.send_response(Code)
 
@@ -135,7 +148,7 @@ class serverHandler(BaseHTTPRequestHandler):
             else:
                 try:
                     serverHandler = routes[self.realPath]
-                    Content, Headers, Code = callHanlder(serverHandler, self.requestHeaders)
+                    Content, Headers, Code = callHandler(serverHandler, self.requestHeaders, self.query)
 
                     self.send_response(Code)
                     if len(Headers) != 0:
@@ -149,7 +162,7 @@ class serverHandler(BaseHTTPRequestHandler):
                     self.wfile.write(Content.encode())
                     writeLogs(clientIP=self.requestHeaders['client-ip'], userAgent=self.requestHeaders['user-agent'], endpointVisited=self.realPath, responseCode=Code, requestMethod=self.requestHeaders['request-method'])
                 except Exception as e:
-                    Content, Headers, Code = callHanlder("404Handler.py", self.requestHeaders)
+                    Content, Headers, Code = callHandler("404Handler.py", self.requestHeaders, self.query)
 
                     self.send_response(Code)
 
@@ -170,4 +183,10 @@ class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
 def serveServer(serverPort, defaultDocument):
     httpServer = ThreadedHTTPServer(('' , serverPort), serverHandler)
     showGood(goodRule="Server Created" , Message=f"The server is running successfully on port {serverPort}")
-    httpServer.serve_forever()
+    
+    try:
+        httpServer.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        httpServer.server_close()

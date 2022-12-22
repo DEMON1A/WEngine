@@ -2,7 +2,7 @@ from utils.makeResponse import returnHTTPBasicResponse, returnRenderedTemplate
 from utils.logsController import readLogs
 from config.settings import PUBLIC_LOGS
 
-def Handler(requestHeaders):
+def Handler(requestHeaders, requestParameters):
     if PUBLIC_LOGS:
         return returnHTTPBasicResponse(readLogs(), {"content-type":"text/plain"}, 200)
     elif requestHeaders['client-ip'] == "127.0.0.1":

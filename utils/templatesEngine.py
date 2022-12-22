@@ -2,8 +2,10 @@ import re
 from os.path import exists
 from os import popen
 from datetime import datetime
-from urllib.parse import quote
 from time import gmtime, strftime
+
+from urllib.parse import quote
+from urllib.parse import urlencode
 
 from utils.showMessage import showError
 from utils.markdownSupport import createMarkdown, secureMarkdown
@@ -170,14 +172,14 @@ class templatesParser:
                 basePath = urlModes[syntaxArguments[1]]
                 basePath += f"{variableValue}"
             except Exception:
-                showError(exceptionRule="Mode/Variable Error", Message="There's an error with the mode or the variable, check both of them.")
+                showError(exceptionRule="Mode or Variable error", Message="There's an error with the mode or the variable, check both of them.")
                 return ""
         else:
             try:
-                basePath = urlModes[syntaxArguments[1]]
-                basePath += f"{syntaxArguments[2]}"
+                basePath = urlModes[syntaxArguments[0]]
+                basePath += f"{syntaxArguments[1]}"
             except Exception:
-                showError(exceptionRule="Mode Error", Message="There's an error with your mode, double check it.")
+                showError(exceptionRule="Mode error", Message="There's an error with your mode, double check it.")
                 return ""
 
         basePath = basePath.replace('//', '/')
@@ -216,7 +218,7 @@ class templatesParser:
                     showError(exceptionRule="Variables Error", Message="The variable you're using isn't defined")
                     return ""
             else:
-                cmdResults = poepn(syntaxArguments[1]).read()
+                cmdResults = popen(syntaxArguments[1]).read()
                 return cmdResults
         else:
             return ""

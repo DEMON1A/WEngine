@@ -1,8 +1,11 @@
 import optparse
 import concurrent.futures
+import sys
+import inspect
 
 from modes.classes import *
 from utils.showMessage import showError
+from utils.showMessage import showGood
 
 
 '''
@@ -38,7 +41,8 @@ def buildConfig():
 
 def collectOptions():
     optionsParser = optparse.OptionParser()
-    optionsParser.add_option("--mode", "-m", default="runserver", dest="mode", help="The Mode That Contains The Actions You Wants To Perform")
+    optionsParser.add_option("--mode", "-m", default="runserver", dest="mode", help="The mode that contains the actions you wants to execute")
+    optionsParser.add_option("--list", "-l", action="store_true", dest="list", help="List all the available modes you can use")
 
     toolOptions,_ = optionsParser.parse_args()
     return toolOptions
@@ -50,16 +54,27 @@ def mainFunction(Options):
     but i's still on development process
     '''
 
-    try:
-        userMode = Options.mode
+    if Options.list == None:
+        try:
+            userMode = Options.mode
 
-        modeClass = globals()[userMode]()
-        modeFunction = getattr(modeClass , userMode)
+            modeClass = globals()[userMode]()
+            modeFunction = getattr(modeClass , userMode)
 
-        applicationConfig = buildConfig()
-        modeFunction(applicationConfig)
-    except Exception as e:
-        showError(exceptionRule="Mode Error" , Message=f"The mode {userMode} doesn't exists on the classes")
+            applicationConfig = buildConfig()
+            modeFunction(applicationConfig)
+        except Exception as e:
+            showError(exceptionRule="Mode Error", Message=f"The mode {userMode} doesn't exists on the classes")
+    else:
+        try:
+            from modes import classes
+            moduleName = sys.modules[classes.__name__]
+
+            for _, classObject in inspect.getmembers(moduleName):
+                if inspect.isclass(classObject):
+                    showGood(goodRule=classObject.__name__, Message=classObject().description)
+        except Exception as e:
+            showError(exceptionRule="List error", Message="We couldn't list the program modes")
 
 if __name__ == "__main__":
     with concurrent.futures.ThreadPoolExecutor() as optionsCollector:
