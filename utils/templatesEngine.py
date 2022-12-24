@@ -129,10 +129,10 @@ class templatesParser:
         globalCounter = 0
         argumentsMap = {}
 
-        functionName = self.detectFunction(templateSyntax)
-        templateSyntax = self.filterString(templateSyntax, functionName)
+        functionName = self.detectFunction(templateSyntax).strip()
+        templateSyntax = self.filterString(templateSyntax, functionName).strip()
 
-        argumentString = self.getArguments(templateSyntax, functionName)
+        argumentString = self.getArguments(templateSyntax, functionName).strip()
         argumentsList = []
 
         argumentsList += self.getQoutes(argumentString, "'")
@@ -142,14 +142,14 @@ class templatesParser:
             globalCounter += 1
             replaceString = f"arg{str(globalCounter)}"
             argumentsMap[replaceString] = singleQoute
-            argumentString = argumentString.replace(singleQoute, replaceString)
+            argumentString = argumentString.replace(singleQoute, replaceString).strip()
 
         argumentsParameters = argumentString.split(':')
         fullValueParameters = []
 
         for singleParameter in argumentsParameters:
             singleParameter = singleParameter.strip()
-            fullValueParameters.append(argumentsMap[singleParameter].replace('"', '').replace("'", ''))
+            fullValueParameters.append(argumentsMap[singleParameter].replace('"', '').replace("'", '').strip())
 
         return fullValueParameters
 
