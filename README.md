@@ -1,5 +1,5 @@
 # WEngine (WEB Engine) :dizzy: ![](https://tokei.rs/b1/github/DEMON1A/WEngine)
-- WEngine is a web framework written in python allows you to create your own web applications
+- WEngine is a web framework written in python allows you to create your own web applications, it's currently still in beta
 
 ## What Functions WEngine is Using?
 - In WEngine. I wrote everything from zero. it starts with the python server that's written with `http.server` in python. and linked with the user controlled routes to allow the user to set his own routes on the server with it's handler. that controls the content on the response the client is getting. after that WEngine is using **regex** to detect your template syntaxes inside of the HTML code. that allow you to use a pre-made functions inside your HTML template and do back-end functions on the front-end side like reading files, executing commands, passing variables, ..etc

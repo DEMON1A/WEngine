@@ -122,3 +122,31 @@ class createuser:
             showGood(goodRule="\nUser created", Message=f"{__DEFAULT_DB_USERNAME__} has been added into the database: {__DEFAULT_DB_NAME__}")
         else:
             showError(exceptionRule="Path Error", Message="The database hasn't been created, please run migrate to create it.")
+
+class createroute:
+    def __init__(self):
+        self.description = "Creates a web route for the web application"
+
+    def validateRoutes(self, routeName, routePath):
+        from utils.routesValidator import validatePath
+        from utils.routesValidator import validateRoute
+        from utils.showMessage import showError
+
+        if not validateRoute(routeName):
+            showError(exceptionRule="Invalid route", Message="Your route may contain characters we don't allow")
+            exit()
+
+        self.routePath = validatePath(routePath=routePath)
+
+    # We need to know the route path and the filename from the user
+    def createroute(self, serverConfig):
+        routeName = input("Web route: ")
+        routePath = input("Route handler: ")
+        self.validateRoutes(routeName=routeName, routePath=routePath)
+
+        # If everything goes well proceed then.
+        from config.routes import createRoute
+        from utils.showMessage import showGood
+
+        createRoute(routeName=routeName, routePath=routePath)
+        showGood(goodRule="Route Created", Message=f"Your route {routeName} has been created and it's pointing to {routePath}")

@@ -1,0 +1,4 @@
+{
+    "/": "homeHandler.py",
+    "/logs": "logsHandler.py"
+}

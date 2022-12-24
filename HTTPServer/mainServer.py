@@ -1,5 +1,7 @@
 import sys
 import os
+import time
+import threading
 
 from http.server import HTTPServer
 from http.server import BaseHTTPRequestHandler
@@ -17,13 +19,14 @@ from HTTPServer.handlerCaller import callHandler
 from HTTPServer.securityHeaders import buildHeaders
 
 from main import buildConfig
-from config.routes import routes
+from config.routes import loadRoutes
 from config.ct import __CT__
 
 from config.settings import STATIC_PATH, BLOCKED_PATHS
 
 class serverHandler(BaseHTTPRequestHandler):
     def do_GET(self):
+        self.routes = loadRoutes()
         self.realPath = self.path.replace('//' , '/')
         self.realPath = parsePath(self.realPath)
         self.query = parseQuery(self.path)
@@ -39,7 +42,7 @@ class serverHandler(BaseHTTPRequestHandler):
 
         if self.realPath == "/":
             try:
-                serverHandler = routes['/']
+                serverHandler = self.routes['/']
                 print(serverHandler)
                 Content, Headers, Code = callHandler(serverHandler, self.requestHeaders, self.query)
 
@@ -147,7 +150,7 @@ class serverHandler(BaseHTTPRequestHandler):
                 writeLogs(clientIP=self.requestHeaders['client-ip'], userAgent=self.requestHeaders['user-agent'], endpointVisited=self.realPath, responseCode=Code, requestMethod=self.requestHeaders['request-method'])
             else:
                 try:
-                    serverHandler = routes[self.realPath]
+                    serverHandler = self.routes[self.realPath]
                     Content, Headers, Code = callHandler(serverHandler, self.requestHeaders, self.query)
 
                     self.send_response(Code)
@@ -180,13 +183,37 @@ class serverHandler(BaseHTTPRequestHandler):
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     """Working on handling requests in a separate thread"""
 
+class WebServer(threading.Thread):
+    def __init__(self):
+        super().__init__()
+        self.host = "localhost"
+        self.port = 8080
+        self.ws = ThreadedHTTPServer((self.host, self.port), serverHandler)
+
+    def run(self):
+        showGood(goodRule="Server Created" , Message=f"The server is running successfully on port {self.port}")
+
+        try:
+            self.ws.serve_forever()
+        except Exception:
+            self.shutdown()
+
+    def shutdown(self):
+        # set the two flags needed to shutdown the HTTP server manually
+        self.ws._BaseServer__is_shut_down.set()
+        self.ws.__shutdown_request = True
+
+        showGood(goodRule="Note", Message="Shutting down the server")
+        # call it anyway, for good measure...
+        self.ws.shutdown()
+        showGood(goodRule="Note", Message="Closed the server")
+        self.ws.server_close()
+        showGood(goodRule="Note", Message="Closed the thread")
+        self.join()
+
 def serveServer(serverPort, defaultDocument):
-    httpServer = ThreadedHTTPServer(('' , serverPort), serverHandler)
-    showGood(goodRule="Server Created" , Message=f"The server is running successfully on port {serverPort}")
-    
     try:
-        httpServer.serve_forever()
-    except KeyboardInterrupt:
-        pass
-    finally:
-        httpServer.server_close()
+        httpServer = WebServer()
+        httpServer.run()
+    except Exception:
+        httpServer.shutdown()

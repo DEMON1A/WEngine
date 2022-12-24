@@ -64,6 +64,7 @@ def mainFunction(Options):
             applicationConfig = buildConfig()
             modeFunction(applicationConfig)
         except Exception as e:
+            print(e)
             showError(exceptionRule="Mode Error", Message=f"The mode {userMode} doesn't exists on the classes")
     else:
         try:
