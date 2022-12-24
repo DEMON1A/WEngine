@@ -142,7 +142,12 @@ class createroute:
     def createroute(self, serverConfig):
         routeName = input("Web route: ")
         routePath = input("Route handler: ")
-        self.validateRoutes(routeName=routeName, routePath=routePath)
+
+        # Routes need to be validated as it's supposed to start with /
+        if not routeName.strip().startswith('/'):
+            routeName = f"/{routeName}"
+
+        self.validateRoutes(routeName=routeName.strip(), routePath=routePath.strip())
 
         # If everything goes well proceed then.
         from config.routes import createRoute
